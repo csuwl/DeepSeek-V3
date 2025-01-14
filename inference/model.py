@@ -6,6 +6,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 import torch.distributed as dist
+from torch.onnx.symbolic_opset9 import tensor
 
 from kernel import act_quant, weight_dequant, fp8_gemm
 
@@ -115,6 +116,7 @@ class ParallelEmbedding(nn.Module):
         Raises:
             ValueError: If `world_size` is not defined.
         """
+        mask = torch.empty()
         if world_size > 1:
             mask = (x < self.vocab_start_idx) | (x >= self.vocab_end_idx)
             x = x - self.vocab_start_idx
